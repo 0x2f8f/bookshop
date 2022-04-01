@@ -9,7 +9,10 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 /** A review of a book. */
 #[ORM\Entity]
-#[ApiResource]
+#[ApiResource(
+    collectionOperations: ['get', 'post'],
+    itemOperations: ['get', 'delete'],
+)]
 class Review
 {
     /** The id of this review. */
