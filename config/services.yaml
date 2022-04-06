@@ -27,5 +27,28 @@ services:
         decorates: 'api_platform.openapi.factory'
         arguments: [ '@.inner' ]
 
+    App\OpenApi\PostDecorator:
+        decorates: 'api_platform.openapi.factory'
+        arguments: [ '@.inner' ]
+
+    security.user.provider.concrete.app_auth_user_provider:
+        class: App\Security\User\AuthEntityUserProvider
+        parent: security.user.provider.concrete.app_user_provider
+
+    app.custom_authenticator:
+        class: App\Security\CustomAuthenticator
+        parent: lexik_jwt_authentication.security.jwt_authenticator
+        arguments:
+            $jwtManager: '@lexik_jwt_authentication.jwt_manager'
+            $eventDispatcher: '@event_dispatcher'
+            $tokenExtractor: '@lexik_jwt_authentication.extractor.chain_extractor'
+#            $userProvider: '@security.user.provider.concrete.app_user_provider'
+            $userProvider: '@security.user.provider.concrete.app_auth_user_provider'
+            $translator: ~
+
+    user_manager_service:
+        class: App\Security\UserManagerService
+        arguments: [ '@security.token_storage' ]
+
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones

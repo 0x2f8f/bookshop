@@ -4,14 +4,17 @@ namespace App\Controller;
 
 use App\Entity\Post;
 use App\Repository\PostRepository;
+use App\Security\UserManagerService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 
+
 /**
  * Class PostController
+ *
  * @package App\Controller
  * @Route("/api/posts", name="post_api")
  */
@@ -19,12 +22,17 @@ class PostController extends AbstractController
 {
     /**
      * @param PostRepository $postRepository
+     * @param UserManagerService $userManagerService
      * @return JsonResponse
      * @Route("/", name="posts", methods={"GET"})
      */
-    public function getPosts(PostRepository $postRepository): JsonResponse
+    public function getPosts(PostRepository $postRepository, UserManagerService $userManagerService): JsonResponse
     {
+        if (!$userManagerService->getCurrentUser()) {
+            return $this->response([], 403);
+        }
         $data = $postRepository->findAll();
+        
         return $this->response($data);
     }
     
@@ -36,8 +44,11 @@ class PostController extends AbstractController
      * @throws \Exception
      * @Route("/", name="posts_add", methods={"POST"})
      */
-    public function addPost(Request $request, EntityManagerInterface $entityManager, PostRepository $postRepository): JsonResponse
-    {
+    public function addPost(
+        Request                $request,
+        EntityManagerInterface $entityManager,
+        PostRepository         $postRepository
+    ): JsonResponse {
         try {
             $request = $this->transformJsonBody($request);
             
@@ -52,7 +63,7 @@ class PostController extends AbstractController
             $entityManager->flush();
             
             $data = [
-                'status' => 200,
+                'status'  => 200,
                 'success' => "Post added successfully",
             ];
             return $this->response($data);
@@ -135,6 +146,7 @@ class PostController extends AbstractController
     }
     
     /**
+     * @param EntityManagerInterface $entityManager
      * @param PostRepository $postRepository
      * @param $id
      * @return JsonResponse
