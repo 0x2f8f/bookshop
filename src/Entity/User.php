@@ -20,6 +20,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     
     #[ORM\Column(type: 'string', length: 180, unique: true)]
     private $username;
+    
+    #[ORM\Column(type: 'string', length: 8, unique: true)]
+    private $hash;
 
     #[ORM\Column(type: 'json')]
     private array $roles = [];
@@ -98,6 +101,22 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->password = $password;
 
         return $this;
+    }
+    
+    /**
+     * @return mixed
+     */
+    public function getHash()
+    {
+        return $this->hash;
+    }
+    
+    /**
+     * @param mixed $hash
+     */
+    public function setHash($hash): void
+    {
+        $this->hash = $hash;
     }
 
     /**

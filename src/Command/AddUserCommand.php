@@ -166,6 +166,7 @@ class AddUserCommand extends Command
         // create the user and hash its password
         $user = new User();
         $user->setUsername($username);
+        $user->setHash(substr(str_shuffle("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"),0,8));
         $user->setEmail($email);
         $user->setRoles([$isAdmin ? 'ROLE_ADMIN' : 'ROLE_USER']);
         
